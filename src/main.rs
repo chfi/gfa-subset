@@ -1,18 +1,23 @@
-use gfa::gfa::{Link, Path, Segment, GFA};
+use gfa::gfa::GFA;
 use gfa::parser::parse_gfa;
-use gfa::writer::{gfa_string, write_gfa};
+use gfa::writer::gfa_string;
 
 use std::env;
 use std::path::PathBuf;
 
 use std::collections::HashSet;
+use std::process::exit;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let path = PathBuf::from(args[0].clone());
+    if args.len() < 3 {
+        println!("Usage: {} <path-to-gfa> [<path names>]", args[0]);
+        exit(1);
+    }
+    let path = PathBuf::from(args[1].clone());
     if let Some(gfa) = parse_gfa(&path) {
         // Set of the path names we're interested in
-        let path_names: HashSet<_> = args.into_iter().skip(1).collect();
+        let path_names: HashSet<_> = args.into_iter().skip(2).collect();
 
         // Filter out the paths in the GFA we don't want
         let paths: Vec<_> = gfa
@@ -55,12 +60,8 @@ fn main() {
         };
 
         println!("{}", gfa_string(&new_gfa));
-
-    // let find_path = |pn: &str| gfa.paths.iter().find(|
-    // let paths = path_names.iter().map(|pn| {
-    //     gfa.paths.iter().filter(
-    // });
     } else {
-        panic!("Could not read provided .gfa file");
+        println!("Usage: {} <path-to-gfa> [<path names>]", args[0]);
+        exit(1);
     }
 }
